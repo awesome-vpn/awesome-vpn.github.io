@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Awesome VPN - Free Proxy Nodes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .lang-switch {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .lang-switch button {
+            background: #f0f0f0;
+            border: none;
+            padding: 8px 16px;
+            margin: 0 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .lang-switch button:hover {
+            background: #e0e0e0;
+        }
+        
+        .lang-switch button.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .card-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .card-desc {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 12px;
+        }
+        
+        .copy-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .copy-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+        
+        .copy-btn.copied {
+            background: #28a745;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌍 Awesome VPN</h1>
+            <p data-en="Free proxy nodes, updated daily" data-cn="免费代理节点，每日自动更新">Free proxy nodes, updated daily</p>
+        </div>
+        
+        <div class="lang-switch">
+            <button class="active" onclick="setLang('en')">English</button>
+            <button onclick="setLang('cn')">简体中文</button>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">
+                <span>📋</span>
+                <span data-en="Base64 List" data-cn="Base64 列表">Base64 List</span>
+            </div>
+            <div class="card-desc" data-en="Best for: v2rayN, v2rayNG, Streisand" data-cn="适用：v2rayN、v2rayNG、Streisand">Best for: v2rayN, v2rayNG, Streisand</div>
+            <button class="copy-btn" onclick="copyLink(this, 'https://raw.githubusercontent.com/awesome-vpn/awesome-vpn/master/all')">
+                <span>📋</span>
+                <span data-en="Copy Link" data-cn="复制链接">Copy Link</span>
+            </button>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">
+                <span>⚙️</span>
+                <span>Sing-box JSON</span>
+            </div>
+            <div class="card-desc" data-en="Best for: Sing-box, NekoBox" data-cn="适用：Sing-box、NekoBox">Best for: Sing-box, NekoBox</div>
+            <button class="copy-btn" onclick="copyLink(this, 'https://raw.githubusercontent.com/awesome-vpn/awesome-vpn/master/sing-box.json')">
+                <span>📋</span>
+                <span data-en="Copy Link" data-cn="复制链接">Copy Link</span>
+            </button>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">
+                <span>🚀</span>
+                <span>Clash YAML</span>
+            </div>
+            <div class="card-desc" data-en="Best for: Clash Verge Rev, ClashX" data-cn="适用：Clash Verge Rev、ClashX">Best for: Clash Verge Rev, ClashX</div>
+            <button class="copy-btn" onclick="copyLink(this, 'https://raw.githubusercontent.com/awesome-vpn/awesome-vpn/master/clash.yaml')">
+                <span>📋</span>
+                <span data-en="Copy Link" data-cn="复制链接">Copy Link</span>
+            </button>
+        </div>
+        
+        <div class="footer">
+            <p data-en="Daily update at 00:00 UTC" data-cn="每天 UTC 00:00 自动更新">Daily update at 00:00 UTC</p>
+            <a href="https://github.com/awesome-vpn/awesome-vpn" class="github-link" target="_blank">
+                <svg height="16" width="16" viewBox="0 0 16 16"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+                GitHub
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        function copyLink(btn, url) {
+            navigator.clipboard.writeText(url).then(() => {
+                const originalHTML = btn.innerHTML;
+                btn.classList.add('copied');
+                btn.innerHTML = '<span>✓</span><span>' + (currentLang === 'cn' ? '已复制！' : 'Copied!') + '</span>';
+                
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = originalHTML;
+                }, 2000);
+            }).catch(err => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = url;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                const originalHTML = btn.innerHTML;
+                btn.classList.add('copied');
+                btn.innerHTML = '<span>✓</span><span>' + (currentLang === 'cn' ? '已复制！' : 'Copied!') + '</span>';
+                
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = originalHTML;
+                }, 2000);
+            });
+        }
+        
+        let currentLang = 'en';
+        
+        function setLang(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-switch button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                el.textContent = el.getAttribute('data-' + lang);
+            });
+        }
+    </script>
+</body>
+</html>
