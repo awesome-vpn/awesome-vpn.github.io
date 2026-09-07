@@ -1171,8 +1171,8 @@
             <div class="mirror-select-bar">
                 <span data-en="Subscription Source:" data-cn="订阅加速源：">Subscription Source:</span>
                 <div class="mirror-pill-group">
-                    <button class="mirror-tab active" id="mirror-raw" onclick="setMirror('raw')">GitHub Raw</button>
-                    <button class="mirror-tab" id="mirror-cdn" onclick="setMirror('cdn')">jsDelivr CDN ⚡</button>
+                    <button class="mirror-tab active" id="mirror-cdn" onclick="setMirror('cdn')">jsDelivr CDN ⚡</button>
+                    <button class="mirror-tab" id="mirror-raw" onclick="setMirror('raw')">GitHub Raw</button>
                 </div>
             </div>
         </section>
@@ -1250,7 +1250,7 @@
                     </div>
 
                     <div class="url-box" id="url-clash">
-                        https://raw.githubusercontent.com/awesome-vpn/awesome-vpn/master/clash.yaml
+                        https://cdn.jsdelivr.net/gh/awesome-vpn/awesome-vpn@master/clash.yaml
                     </div>
                 </div>
 
@@ -1300,7 +1300,7 @@
                     </div>
 
                     <div class="url-box" id="url-singbox">
-                        https://raw.githubusercontent.com/awesome-vpn/awesome-vpn/master/sing-box.json
+                        https://cdn.jsdelivr.net/gh/awesome-vpn/awesome-vpn@master/sing-box.json
                     </div>
                 </div>
 
@@ -1350,7 +1350,7 @@
                     </div>
 
                     <div class="url-box" id="url-all">
-                        https://raw.githubusercontent.com/awesome-vpn/awesome-vpn/master/all
+                        https://cdn.jsdelivr.net/gh/awesome-vpn/awesome-vpn@master/all
                     </div>
                 </div>
 
@@ -1385,9 +1385,9 @@
                     <div class="step-index-badge">01</div>
                     <div class="step-text">
                         <h4 data-en="Import or Scan" data-cn="导入或扫码">Import or Scan</h4>
-                        <p data-en="Click 'One-Click Import to Clash' above, or click 'Scan with Phone' to read the QR code on your mobile device."
-                           data-cn="点击页面上方的「一键导入到 Clash」，或者点击「手机扫码导入」使用移动端相机/客户端扫码。">
-                            Click 'One-Click Import to Clash' above, or click 'Scan with Phone' to read the QR code on your mobile device.
+                        <p data-en="Click 'One-Click Import' on your preferred format card below, or click the QR code icon to scan with your mobile client."
+                           data-cn="在下方卡片中点击对应格式的「一键导入」，或点击二维码图标使用手机客户端扫码。">
+                            Click 'One-Click Import' on your preferred format card below, or click the QR code icon to scan with your mobile client.
                         </p>
                     </div>
                 </div>
@@ -1562,7 +1562,7 @@
             }
         };
 
-        let currentMirror = 'raw';
+        let currentMirror = 'cdn';
         let currentLang = 'en';
         let currentModalType = 'clash';
         let qrCodeInstance = null;
