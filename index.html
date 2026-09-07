@@ -2,32 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Awesome VPN - High-Speed Free Proxy Subscriptions</title>
-    <meta name="description" content="Free proxy nodes updated daily. One-click import to Clash and Sing-box, or copy subscription links. Zero configuration, 100% free and open-source.">
+    <meta name="description" content="Free proxy nodes updated daily. One-click import to Clash and Sing-box, or scan QR code. Zero configuration, 100% free and open-source.">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
+    <script src="qrcode.min.js"></script>
     <style>
         :root {
-            --bg-base: #090d16;
-            --bg-card: rgba(17, 24, 39, 0.72);
-            --bg-card-hover: rgba(24, 33, 53, 0.82);
-            --bg-subtle: rgba(255, 255, 255, 0.04);
-            --border-card: rgba(255, 255, 255, 0.08);
-            --border-card-hover: rgba(255, 255, 255, 0.18);
+            --bg-base: #06080e;
+            --bg-surface: rgba(13, 18, 30, 0.72);
+            --bg-surface-hover: rgba(20, 28, 48, 0.85);
+            --bg-card: rgba(15, 23, 42, 0.65);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.22);
             --primary: #3b82f6;
-            --primary-hover: #2563eb;
-            --primary-glow: rgba(59, 130, 246, 0.35);
+            --primary-glow: rgba(59, 130, 246, 0.4);
+            --cyan: #06b6d4;
+            --cyan-glow: rgba(6, 182, 212, 0.35);
             --emerald: #10b981;
-            --emerald-glow: rgba(16, 185, 129, 0.25);
+            --emerald-glow: rgba(16, 185, 129, 0.35);
+            --violet: #8b5cf6;
+            --violet-glow: rgba(139, 92, 246, 0.35);
             --amber: #f59e0b;
-            --purple: #8b5cf6;
             --text-main: #f8fafc;
             --text-secondary: #94a3b8;
             --text-muted: #64748b;
-            --radius-lg: 20px;
+            --radius-xl: 24px;
+            --radius-lg: 16px;
             --radius-md: 12px;
             --radius-sm: 8px;
             --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         }
 
         * {
@@ -47,94 +52,127 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Ambient background glow effects */
-        .ambient-glow {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(120px);
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0.45;
-        }
-
-        .glow-1 {
-            width: 480px;
-            height: 480px;
-            background: radial-gradient(circle, #3b82f6 0%, rgba(59, 130, 246, 0) 70%);
-            top: -120px;
-            left: -100px;
-        }
-
-        .glow-2 {
-            width: 520px;
-            height: 520px;
-            background: radial-gradient(circle, #8b5cf6 0%, rgba(139, 92, 246, 0) 70%);
-            top: 25%;
-            right: -150px;
-        }
-
-        .glow-3 {
-            width: 440px;
-            height: 440px;
-            background: radial-gradient(circle, #10b981 0%, rgba(16, 185, 129, 0) 70%);
-            bottom: -80px;
-            left: 20%;
-        }
-
-        /* Background grid overlay */
-        .grid-bg {
+        /* Canvas background */
+        #bg-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-            background-size: 40px 40px;
             z-index: 0;
             pointer-events: none;
         }
 
-        .wrapper {
-            position: relative;
+        /* Subtle grid pattern overlay */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
             z-index: 1;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 24px 20px 60px;
+            pointer-events: none;
         }
 
-        /* Navigation Header */
+        /* Ambient light glows container */
+        .ambient-glow-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(140px);
+            pointer-events: none;
+            opacity: 0.35;
+        }
+
+        .orb-top-left {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #2563eb 0%, transparent 70%);
+            top: -150px;
+            left: -150px;
+        }
+
+        .orb-top-right {
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+            top: 10%;
+            right: -120px;
+        }
+
+        .orb-bottom-center {
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, #059669 0%, transparent 70%);
+            bottom: -150px;
+            left: 30%;
+        }
+
+        /* Main container layout */
+        .wrapper {
+            position: relative;
+            z-index: 2;
+            max-width: 1140px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px 20px 80px;
+        }
+
+        /* Top navigation header */
         header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 20px;
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--border-card);
+            padding: 12px 24px;
+            background: rgba(13, 18, 30, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-subtle);
             border-radius: 9999px;
             margin-bottom: 48px;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
         }
 
         .nav-brand {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             font-weight: 700;
-            font-size: 1.15rem;
+            font-size: 1.2rem;
             color: #fff;
             text-decoration: none;
+            letter-spacing: -0.02em;
         }
 
-        .nav-brand .brand-badge {
-            font-size: 0.72rem;
-            font-weight: 600;
+        .nav-brand .brand-logo {
+            font-size: 1.4rem;
+            filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5));
+        }
+
+        .nav-brand .brand-pill {
+            font-size: 0.7rem;
+            font-weight: 700;
             padding: 2px 8px;
             border-radius: 9999px;
-            background: rgba(59, 130, 246, 0.15);
-            color: #60a5fa;
-            border: 1px solid rgba(59, 130, 246, 0.3);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+            color: #93c5fd;
+            border: 1px solid rgba(147, 197, 253, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .nav-actions {
@@ -143,42 +181,60 @@
             gap: 12px;
         }
 
-        .live-status {
+        .live-status-pill {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 4px 12px;
+            padding: 5px 14px;
             border-radius: 9999px;
             background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.25);
+            border: 1px solid rgba(16, 185, 129, 0.3);
             color: #34d399;
             font-size: 0.8rem;
-            font-weight: 500;
+            font-weight: 600;
         }
 
-        .status-dot {
-            width: 7px;
-            height: 7px;
+        .status-radar {
+            position: relative;
+            width: 8px;
+            height: 8px;
+        }
+
+        .radar-core {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             background-color: var(--emerald);
-            box-shadow: 0 0 10px var(--emerald);
-            animation: pulse-dot 2s infinite;
+            box-shadow: 0 0 12px var(--emerald);
         }
 
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.85); }
+        .radar-wave {
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid var(--emerald);
+            opacity: 0;
+            animation: radar-ping 2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
         }
 
-        .lang-toggle {
+        @keyframes radar-ping {
+            0% { transform: scale(0.5); opacity: 0.8; }
+            80% { transform: scale(1.8); opacity: 0; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        .lang-switch-box {
             display: flex;
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.05);
             padding: 3px;
             border-radius: 9999px;
-            border: 1px solid var(--border-card);
+            border: 1px solid var(--border-subtle);
         }
 
-        .lang-btn {
+        .lang-toggle-btn {
             background: transparent;
             border: none;
             color: var(--text-secondary);
@@ -190,20 +246,20 @@
             transition: all 0.2s ease;
         }
 
-        .lang-btn.active {
+        .lang-toggle-btn.active {
             background: #fff;
-            color: #0f172a;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            color: #0b0f19;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
-        .github-btn {
+        .github-link-btn {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border-card);
+            gap: 7px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
             color: var(--text-main);
-            padding: 6px 14px;
+            padding: 7px 16px;
             border-radius: 9999px;
             font-size: 0.85rem;
             font-weight: 500;
@@ -211,131 +267,157 @@
             transition: all 0.2s ease;
         }
 
-        .github-btn:hover {
+        .github-link-btn:hover {
             background: rgba(255, 255, 255, 0.12);
-            border-color: var(--border-card-hover);
+            border-color: var(--border-hover);
+            transform: translateY(-1px);
         }
 
-        /* Hero Section */
+        /* Hero section */
         .hero {
             text-align: center;
-            max-width: 820px;
-            margin: 0 auto 52px;
+            max-width: 860px;
+            margin: 0 auto 40px;
         }
 
-        .hero-pill {
+        .hero-cyber-pill {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 6px 16px;
+            gap: 8px;
+            padding: 6px 18px;
             border-radius: 9999px;
-            background: linear-gradient(90deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15));
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            color: #c4b5fd;
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.15), rgba(6, 182, 212, 0.15));
+            border: 1px solid rgba(6, 182, 212, 0.35);
+            color: #67e8f9;
             font-size: 0.85rem;
-            font-weight: 500;
-            margin-bottom: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
         }
 
         .hero h1 {
-            font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+            font-size: clamp(2.3rem, 5vw, 3.8rem);
             font-weight: 800;
-            letter-spacing: -0.03em;
-            line-height: 1.15;
-            margin-bottom: 18px;
-            background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+            letter-spacing: -0.035em;
+            line-height: 1.12;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #93c5fd 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .hero p {
-            font-size: clamp(1rem, 2vw, 1.2rem);
+            font-size: clamp(1.05rem, 2vw, 1.25rem);
             color: var(--text-secondary);
-            margin-bottom: 32px;
-            line-height: 1.6;
+            margin-bottom: 34px;
+            line-height: 1.65;
         }
 
-        /* Hero Quick Action Buttons */
+        /* Hero quick action launchpad */
         .hero-actions {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 16px;
             flex-wrap: wrap;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
 
-        .btn-primary {
+        .btn-launch-primary {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
             background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
             color: #fff;
-            padding: 14px 28px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 1rem;
+            padding: 15px 30px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 1.05rem;
             text-decoration: none;
-            box-shadow: 0 10px 25px -5px var(--primary-glow);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             cursor: pointer;
-            transition: all 0.25s ease;
+            box-shadow: 0 10px 30px -5px var(--primary-glow);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 14px 30px -5px rgba(99, 102, 241, 0.5);
+        .btn-launch-primary:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 16px 36px -6px rgba(99, 102, 241, 0.6);
             filter: brightness(1.1);
         }
 
-        .btn-secondary {
+        .btn-launch-secondary {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(15, 23, 42, 0.7);
             color: var(--text-main);
-            padding: 14px 26px;
-            border-radius: 12px;
+            padding: 15px 26px;
+            border-radius: var(--radius-md);
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 1.05rem;
             text-decoration: none;
-            border: 1px solid var(--border-card);
-            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-subtle);
+            backdrop-filter: blur(12px);
             cursor: pointer;
             transition: all 0.25s ease;
         }
 
-        .btn-secondary:hover {
+        .btn-launch-secondary:hover {
             background: rgba(255, 255, 255, 0.1);
-            border-color: var(--border-card-hover);
+            border-color: var(--border-hover);
             transform: translateY(-2px);
         }
 
-        /* Source Mirror Selector */
-        .mirror-bar {
+        .btn-launch-qr {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(6, 182, 212, 0.1);
+            color: #67e8f9;
+            padding: 15px 22px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .btn-launch-qr:hover {
+            background: rgba(6, 182, 212, 0.2);
+            border-color: rgba(6, 182, 212, 0.5);
+            transform: translateY(-2px);
+        }
+
+        /* Source accelerator bar */
+        .mirror-select-bar {
             display: inline-flex;
             align-items: center;
             gap: 12px;
-            background: rgba(15, 23, 42, 0.6);
-            padding: 6px 14px;
+            background: rgba(13, 18, 30, 0.65);
+            padding: 6px 16px;
             border-radius: 9999px;
-            border: 1px solid var(--border-card);
+            border: 1px solid var(--border-subtle);
             font-size: 0.85rem;
             color: var(--text-secondary);
+            backdrop-filter: blur(10px);
         }
 
-        .mirror-options {
+        .mirror-pill-group {
             display: flex;
             gap: 4px;
         }
 
-        .mirror-btn {
+        .mirror-tab {
             background: transparent;
             border: none;
             color: var(--text-secondary);
-            padding: 4px 10px;
+            padding: 5px 12px;
             border-radius: 9999px;
             font-size: 0.8rem;
             font-weight: 600;
@@ -343,376 +425,595 @@
             transition: all 0.2s;
         }
 
-        .mirror-btn.active {
-            background: rgba(59, 130, 246, 0.2);
+        .mirror-tab.active {
+            background: rgba(59, 130, 246, 0.22);
             color: #93c5fd;
-            border: 1px solid rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(59, 130, 246, 0.4);
         }
 
-        /* Subscription Cards Section */
-        .section-title-wrap {
-            margin-bottom: 24px;
+        /* Telemetry HUD banner */
+        .telemetry-banner {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin: 40px 0 54px;
+            background: rgba(13, 18, 30, 0.55);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 18px 24px;
+            backdrop-filter: blur(16px);
+        }
+
+        .telemetry-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .telemetry-icon-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .telemetry-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .telemetry-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .telemetry-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* Section titles */
+        .section-header {
             display: flex;
             align-items: flex-end;
             justify-content: space-between;
+            margin-bottom: 24px;
             flex-wrap: wrap;
             gap: 12px;
         }
 
         .section-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
             color: #fff;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .section-desc {
-            font-size: 0.9rem;
+        .section-subtitle {
+            font-size: 0.92rem;
             color: var(--text-secondary);
         }
 
+        /* Spotlight cards grid */
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 22px;
-            margin-bottom: 56px;
+            gap: 24px;
+            margin-bottom: 60px;
+            min-width: 0;
+            width: 100%;
         }
 
-        .sub-card {
+        .spotlight-card {
             background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border-card);
-            border-radius: var(--radius-lg);
-            padding: 26px;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            padding: 28px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             overflow: hidden;
+            min-width: 0;
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        .sub-card:hover {
-            border-color: var(--border-card-hover);
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+        .spotlight-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(59, 130, 246, 0.12), transparent 40%);
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        .sub-card.featured {
+        .spotlight-card:hover::before {
+            opacity: 1;
+        }
+
+        .spotlight-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+        }
+
+        .spotlight-card.card-featured {
             border-color: rgba(59, 130, 246, 0.4);
-            box-shadow: 0 10px 30px -10px var(--primary-glow);
+            box-shadow: 0 10px 35px -10px var(--primary-glow);
         }
 
-        .sub-card.featured::before {
+        .spotlight-card.card-featured::after {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
         }
 
-        .card-top {
-            margin-bottom: 20px;
+        .card-inner {
+            position: relative;
+            z-index: 1;
+            min-width: 0;
+            width: 100%;
         }
 
-        .card-header-row {
+        .card-head {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
 
-        .card-icon-title {
+        .card-title-group {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .card-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
+        .card-glyph {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-card);
+            border: 1px solid var(--border-subtle);
         }
 
-        .card-title-text {
-            font-size: 1.25rem;
-            font-weight: 700;
+        .card-heading {
+            font-size: 1.35rem;
+            font-weight: 800;
             color: #fff;
+            letter-spacing: -0.02em;
         }
 
-        .badge-recommended {
+        .badge-pill-rec {
             background: rgba(16, 185, 129, 0.15);
             color: #34d399;
-            border: 1px solid rgba(16, 185, 129, 0.3);
+            border: 1px solid rgba(16, 185, 129, 0.35);
             font-size: 0.72rem;
             font-weight: 700;
-            padding: 3px 9px;
+            padding: 4px 10px;
             border-radius: 9999px;
-            text-transform: uppercase;
             letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
 
-        .badge-core {
+        .badge-pill-tech {
             background: rgba(139, 92, 246, 0.15);
             color: #c4b5fd;
-            border: 1px solid rgba(139, 92, 246, 0.3);
+            border: 1px solid rgba(139, 92, 246, 0.35);
             font-size: 0.72rem;
             font-weight: 700;
-            padding: 3px 9px;
+            padding: 4px 10px;
             border-radius: 9999px;
             letter-spacing: 0.05em;
         }
 
-        .card-desc {
+        .card-explanation {
             color: var(--text-secondary);
-            font-size: 0.92rem;
-            line-height: 1.5;
-            margin-bottom: 16px;
+            font-size: 0.94rem;
+            line-height: 1.6;
+            margin-bottom: 18px;
+            min-height: 48px;
         }
 
-        .card-tags {
+        .card-features {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
             margin-bottom: 20px;
         }
 
-        .tag {
-            background: var(--bg-subtle);
-            border: 1px solid var(--border-card);
-            color: var(--text-muted);
-            padding: 3px 10px;
+        .feature-tag {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            padding: 4px 10px;
             border-radius: 6px;
             font-size: 0.78rem;
             font-weight: 500;
         }
 
-        /* URL Preview Box */
-        .url-preview {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+        .url-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.07);
             padding: 10px 14px;
             border-radius: var(--radius-sm);
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-family: var(--font-mono);
             font-size: 0.78rem;
             color: #94a3b8;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            margin-bottom: 20px;
+            margin-bottom: 22px;
             user-select: all;
+            min-width: 0;
+            max-width: 100%;
+            box-sizing: border-box;
         }
 
-        /* Card Action Buttons */
-        .card-actions {
+        /* Action buttons in cards */
+        .card-btn-stack {
             display: flex;
             flex-direction: column;
             gap: 10px;
+            position: relative;
+            z-index: 1;
         }
 
-        .btn-action-import {
+        .btn-card-import {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
             width: 100%;
-            padding: 12px 16px;
+            padding: 13px 18px;
             border-radius: var(--radius-sm);
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #fff;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 0.95rem;
             text-decoration: none;
             border: none;
             cursor: pointer;
-            box-shadow: 0 4px 15px -2px var(--emerald-glow);
+            box-shadow: 0 4px 16px -2px var(--emerald-glow);
             transition: all 0.2s ease;
         }
 
-        .btn-action-import:hover {
+        .btn-card-import:hover {
             filter: brightness(1.1);
             transform: translateY(-1px);
         }
 
-        .btn-action-copy {
+        .btn-card-dual {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+        }
+
+        .btn-card-copy {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            width: 100%;
             padding: 12px 16px;
             border-radius: var(--radius-sm);
-            background: rgba(255, 255, 255, 0.07);
+            background: rgba(255, 255, 255, 0.06);
             color: var(--text-main);
             font-weight: 600;
             font-size: 0.95rem;
-            border: 1px solid var(--border-card);
+            border: 1px solid var(--border-subtle);
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
-        .btn-action-copy:hover {
+        .btn-card-copy:hover {
             background: rgba(255, 255, 255, 0.12);
-            border-color: var(--border-card-hover);
+            border-color: var(--border-hover);
         }
 
-        .btn-action-copy.copied {
+        .btn-card-copy.copied {
             background: rgba(16, 185, 129, 0.2);
             border-color: rgba(16, 185, 129, 0.4);
             color: #34d399;
         }
 
-        /* Instructions / Quick Guide */
-        .guide-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border-card);
-            border-radius: var(--radius-lg);
-            padding: 32px;
-            margin-bottom: 56px;
+        .btn-card-qr-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-card-qr-icon:hover {
+            background: rgba(6, 182, 212, 0.15);
+            border-color: rgba(6, 182, 212, 0.35);
+            color: #67e8f9;
+        }
+
+        /* 3-Step quick guide section */
+        .guide-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            padding: 34px;
+            margin-bottom: 60px;
             backdrop-filter: blur(20px);
         }
 
-        .steps-grid {
+        .steps-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 24px;
-            margin-top: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 28px;
+            margin-top: 26px;
         }
 
-        .step-item {
+        .step-tile {
             display: flex;
             gap: 16px;
             align-items: flex-start;
         }
 
-        .step-number {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: rgba(59, 130, 246, 0.15);
-            border: 1px solid rgba(59, 130, 246, 0.3);
+        .step-index-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+            border: 1px solid rgba(59, 130, 246, 0.4);
             color: #60a5fa;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
-            font-size: 1rem;
+            font-weight: 800;
+            font-size: 1.1rem;
             flex-shrink: 0;
+            font-family: var(--font-mono);
         }
 
-        .step-content h4 {
-            font-size: 1.05rem;
-            font-weight: 600;
+        .step-text h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
             margin-bottom: 6px;
             color: #fff;
         }
 
-        .step-content p {
-            font-size: 0.9rem;
+        .step-text p {
+            font-size: 0.92rem;
             color: var(--text-secondary);
-            line-height: 1.5;
+            line-height: 1.55;
         }
 
-        /* Client Download Grid */
-        .clients-section {
-            margin-bottom: 56px;
+        /* Client recommendations section */
+        .clients-wrapper {
+            margin-bottom: 60px;
         }
 
-        .client-policy-note {
+        .policy-tag-pill {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 16px;
+            padding: 8px 18px;
             border-radius: 9999px;
             background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.25);
             color: #34d399;
-            font-size: 0.85rem;
-            font-weight: 500;
+            font-size: 0.86rem;
+            font-weight: 600;
             margin-bottom: 24px;
         }
 
-        .clients-grid {
+        .clients-cards-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 18px;
+            gap: 20px;
         }
 
-        .client-card {
-            background: rgba(17, 24, 39, 0.5);
-            border: 1px solid var(--border-card);
-            border-radius: var(--radius-md);
-            padding: 20px;
-            transition: all 0.2s ease;
+        .client-box {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            transition: all 0.25s ease;
         }
 
-        .client-card:hover {
-            border-color: var(--border-card-hover);
-            background: rgba(24, 33, 53, 0.65);
+        .client-box:hover {
+            border-color: var(--border-hover);
+            background: rgba(20, 28, 48, 0.7);
+            transform: translateY(-2px);
         }
 
-        .client-os {
+        .client-platform {
             display: flex;
             align-items: center;
             gap: 8px;
             font-size: 0.85rem;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin-bottom: 8px;
         }
 
-        .client-name {
-            font-size: 1.1rem;
+        .client-software-title {
+            font-size: 1.15rem;
             font-weight: 700;
             color: #fff;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
 
-        .client-links {
+        .client-action-buttons {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
         }
 
-        .client-link-btn {
+        .client-btn {
             display: inline-flex;
             align-items: center;
             gap: 6px;
             font-size: 0.82rem;
+            font-weight: 600;
             color: #93c5fd;
             text-decoration: none;
-            padding: 6px 12px;
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            border-radius: 6px;
+            padding: 7px 14px;
+            background: rgba(59, 130, 246, 0.12);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            border-radius: 8px;
             transition: all 0.2s;
         }
 
-        .client-link-btn:hover {
-            background: rgba(59, 130, 246, 0.2);
-            border-color: rgba(59, 130, 246, 0.4);
+        .client-btn:hover {
+            background: rgba(59, 130, 246, 0.25);
+            border-color: rgba(59, 130, 246, 0.5);
             color: #bfdbfe;
+        }
+
+        /* Modal styling for QR codes */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(6, 8, 14, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--border-hover);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            max-width: 440px;
+            width: 100%;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+            text-align: center;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.open .modal-card {
+            transform: scale(1);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            color: var(--text-secondary);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .modal-qr-frame {
+            background: #fff;
+            padding: 16px;
+            border-radius: 16px;
+            display: inline-block;
+            margin: 20px auto 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        #modal-qrcode {
+            width: 200px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-type-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .modal-type-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            padding: 5px 12px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-type-btn.active {
+            background: rgba(59, 130, 246, 0.25);
+            color: #93c5fd;
+            border-color: rgba(59, 130, 246, 0.5);
         }
 
         /* Footer */
         footer {
             text-align: center;
             padding: 40px 20px 20px;
-            border-top: 1px solid var(--border-card);
+            border-top: 1px solid var(--border-subtle);
             color: var(--text-muted);
             font-size: 0.9rem;
         }
@@ -731,7 +1032,7 @@
             color: #fff;
         }
 
-        /* Toast Notifications */
+        /* Toast notifications */
         #toast-container {
             position: fixed;
             bottom: 24px;
@@ -743,122 +1044,263 @@
             pointer-events: none;
         }
 
-        .toast {
+        .toast-bubble {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(12px);
+            background: rgba(13, 18, 30, 0.95);
+            backdrop-filter: blur(14px);
             border: 1px solid rgba(255, 255, 255, 0.15);
             color: #fff;
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 12px 22px;
+            border-radius: 9999px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
             opacity: 0;
             transform: translateY(20px);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             pointer-events: auto;
         }
 
-        .toast.show {
+        .toast-bubble.show {
             opacity: 1;
             transform: translateY(0);
         }
 
-        .toast-icon {
+        .toast-bubble-icon {
             color: #34d399;
             font-size: 1.1rem;
         }
 
-        /* Responsive Breakpoints */
-        @media (max-width: 768px) {
+        /* Mobile specific bottom sticky bar */
+        .mobile-quickbar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 12px 16px;
+            padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+            background: rgba(6, 8, 14, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-subtle);
+            z-index: 900;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .mobile-quickbar-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .btn-mob-quick {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            height: 48px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 0.92rem;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Responsive breakpoints */
+        @media (max-width: 900px) {
+            .telemetry-banner {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            html, body {
+                overflow-x: hidden;
+                width: 100%;
+            }
+
             .wrapper {
-                padding: 16px 14px 40px;
+                padding: 14px 14px 96px;
             }
 
             header {
-                margin-bottom: 32px;
-                padding: 10px 16px;
+                padding: 8px 14px;
+                margin-bottom: 28px;
+            }
+
+            .nav-brand {
+                font-size: 1.05rem;
+                gap: 8px;
+            }
+
+            .nav-brand .brand-pill {
+                display: none;
+            }
+
+            .live-status-pill {
+                display: none;
+            }
+
+            .github-link-btn span {
+                display: none;
+            }
+
+            .github-link-btn {
+                padding: 7px 9px;
+            }
+
+            .hero {
+                margin-bottom: 28px;
             }
 
             .hero h1 {
-                font-size: 2.1rem;
+                font-size: clamp(1.8rem, 6.8vw, 2.3rem);
+                line-height: 1.25;
+                word-break: break-word;
             }
 
             .hero p {
-                font-size: 1rem;
+                font-size: 0.98rem;
+                margin-bottom: 24px;
             }
 
             .hero-actions {
                 flex-direction: column;
                 width: 100%;
+                gap: 12px;
             }
 
-            .btn-primary, .btn-secondary {
+            .btn-launch-primary, .btn-launch-secondary, .btn-launch-qr {
                 width: 100%;
-                padding: 14px;
+                padding: 14px 18px;
+                font-size: 0.98rem;
+            }
+
+            .mirror-select-bar {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+                padding: 8px 14px;
+                font-size: 0.8rem;
+            }
+
+            .telemetry-banner {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                padding: 14px 16px;
+                margin: 24px 0 36px;
             }
 
             .cards-grid {
                 grid-template-columns: 1fr;
                 gap: 16px;
+                margin-bottom: 40px;
             }
 
-            .guide-section {
-                padding: 24px 18px;
+            .spotlight-card {
+                padding: 20px 16px;
             }
 
-            .mirror-bar {
-                flex-direction: column;
-                gap: 6px;
-                border-radius: 16px;
+            .card-heading {
+                font-size: 1.2rem;
+            }
+
+            .card-explanation {
+                min-height: auto;
+                font-size: 0.88rem;
+                margin-bottom: 14px;
+            }
+
+            .guide-box {
+                padding: 20px 16px;
+                margin-bottom: 40px;
+            }
+
+            .steps-container {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .clients-wrapper {
+                margin-bottom: 40px;
+            }
+
+            .clients-cards-row {
+                grid-template-columns: 1fr;
+                gap: 14px;
             }
 
             #toast-container {
-                left: 20px;
-                right: 20px;
-                bottom: 20px;
+                left: 14px;
+                right: 14px;
+                bottom: 84px;
                 align-items: center;
             }
 
-            .toast {
+            .toast-bubble {
                 width: 100%;
                 justify-content: center;
+                font-size: 0.85rem;
+                padding: 10px 16px;
+            }
+
+            .mobile-quickbar {
+                display: block;
+            }
+
+            .btn-mob-quick {
+                height: 44px;
+                font-size: 0.88rem;
+                padding: 0 12px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Ambient glow lights -->
-    <div class="ambient-glow glow-1"></div>
-    <div class="ambient-glow glow-2"></div>
-    <div class="ambient-glow glow-3"></div>
-    <div class="grid-bg"></div>
+    <!-- Interactive background particle canvas -->
+    <canvas id="bg-canvas"></canvas>
+    <div class="grid-overlay"></div>
+
+    <!-- Ambient glowing lights -->
+    <div class="ambient-glow-wrapper">
+        <div class="ambient-orb orb-top-left"></div>
+        <div class="ambient-orb orb-top-right"></div>
+        <div class="ambient-orb orb-bottom-center"></div>
+    </div>
 
     <div class="wrapper">
         <!-- Top Navigation -->
         <header>
             <a href="#" class="nav-brand">
-                <span>🌍</span>
-                <span>Awesome VPN</span>
-                <span class="brand-badge">PROXIES</span>
+                <span class="brand-logo">🌍</span>
+                <span class="brand-text">Awesome VPN</span>
+                <span class="brand-pill">MESH v2.5</span>
             </a>
 
             <div class="nav-actions">
-                <div class="live-status">
-                    <span class="status-dot"></span>
-                    <span data-en="Live · Updated Daily" data-cn="实时运行 · 每日更新">Live · Updated Daily</span>
+                <div class="live-status-pill">
+                    <div class="status-radar">
+                        <div class="radar-core"></div>
+                        <div class="radar-wave"></div>
+                    </div>
+                    <span data-en="Nodes Live · 24h Sync" data-cn="实时运行 · 每日同步">Nodes Live · 24h Sync</span>
                 </div>
 
-                <div class="lang-toggle">
-                    <button class="lang-btn active" id="btn-en" onclick="switchLang('en')">EN</button>
-                    <button class="lang-btn" id="btn-cn" onclick="switchLang('cn')">中文</button>
+                <div class="lang-switch-box">
+                    <button class="lang-toggle-btn active" id="btn-en" onclick="switchLang('en')">EN</button>
+                    <button class="lang-toggle-btn" id="btn-cn" onclick="switchLang('cn')">中文</button>
                 </div>
 
-                <a href="https://github.com/awesome-vpn/awesome-vpn" target="_blank" class="github-btn" title="GitHub Repository">
+                <a href="https://github.com/awesome-vpn/awesome-vpn" target="_blank" class="github-link-btn" title="GitHub Repository">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                         <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 005.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
                     </svg>
@@ -869,215 +1311,292 @@
 
         <!-- Hero Section -->
         <section class="hero">
-            <div class="hero-pill">
-                <span>🛡️</span>
-                <span data-en="100% Free & Open-Source Proxy Nodes" data-cn="100% 纯免费开源代理节点">100% Free & Open-Source Proxy Nodes</span>
+            <div class="hero-cyber-pill">
+                <span>⚡</span>
+                <span data-en="HIGH-SPEED PUBLIC PROXY MESH" data-cn="全自动化每日优选代理网络">HIGH-SPEED PUBLIC PROXY MESH</span>
             </div>
-            <h1 data-en="Fast, Reliable Proxies. Zero Configuration." data-cn="高质量免费代理节点，无需繁琐配置">Fast, Reliable Proxies. Zero Configuration.</h1>
-            <p data-en="Curated daily proxy subscriptions. Tap to import straight into your favorite client or copy subscription links with a single tap."
-               data-cn="每日自动维护与健康测活。一键直达导入主流客户端，或轻触复制专属订阅链接。">
-                Curated daily proxy subscriptions. Tap to import straight into your favorite client or copy subscription links with a single tap.
+
+            <h1 data-en="High-Speed Proxies. Zero Configuration." data-cn="极速免费代理，无需复杂配置">
+                High-Speed Proxies. Zero Configuration.
+            </h1>
+
+            <p data-en="Daily validated proxies delivered with instant one-click launch or phone scan. Free, open-source, and seamlessly routed in your local client."
+               data-cn="每日全自动健康检查与测活。一键呼起客户端立即导入，或手机扫码即用。100% 纯免费开源。">
+                Daily validated proxies delivered with instant one-click launch or phone scan. Free, open-source, and seamlessly routed in your local client.
             </p>
 
             <!-- Hero Action Buttons -->
             <div class="hero-actions">
-                <button class="btn-primary" onclick="importClash()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <button class="btn-launch-primary" onclick="importClash()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                     </svg>
                     <span data-en="⚡ One-Click Import to Clash" data-cn="⚡ 一键导入到 Clash">⚡ One-Click Import to Clash</span>
                 </button>
-                <button class="btn-secondary" onclick="importSingbox()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+                <button class="btn-launch-secondary" onclick="importSingbox()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="7 10 12 15 17 10"></polyline>
                         <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
                     <span data-en="⚡ Import to Sing-box" data-cn="⚡ 一键导入到 Sing-box">⚡ Import to Sing-box</span>
                 </button>
+
+                <button class="btn-launch-qr" onclick="openQrModal('clash')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span data-en="📱 Scan with Phone" data-cn="📱 手机扫码导入">📱 Scan with Phone</span>
+                </button>
             </div>
 
-            <!-- CDN Mirror Switcher -->
-            <div class="mirror-bar">
-                <span data-en="Download Source:" data-cn="订阅源选择：">Download Source:</span>
-                <div class="mirror-options">
-                    <button class="mirror-btn active" id="mirror-raw" onclick="setMirror('raw')">GitHub Raw</button>
-                    <button class="mirror-btn" id="mirror-cdn" onclick="setMirror('cdn')">jsDelivr CDN (Fast)</button>
+            <!-- Source Accelerator Switcher -->
+            <div class="mirror-select-bar">
+                <span data-en="Subscription Source:" data-cn="订阅加速源：">Subscription Source:</span>
+                <div class="mirror-pill-group">
+                    <button class="mirror-tab active" id="mirror-raw" onclick="setMirror('raw')">GitHub Raw</button>
+                    <button class="mirror-tab" id="mirror-cdn" onclick="setMirror('cdn')">jsDelivr CDN ⚡</button>
                 </div>
             </div>
         </section>
 
-        <!-- Subscription Cards Grid -->
-        <div class="section-title-wrap">
+        <!-- Live Telemetry HUD Strip -->
+        <div class="telemetry-banner">
+            <div class="telemetry-item">
+                <div class="telemetry-icon-box" style="color: #34d399;">🟢</div>
+                <div class="telemetry-content">
+                    <span class="telemetry-label" data-en="Network Health" data-cn="网络状态">Network Health</span>
+                    <span class="telemetry-value" data-en="100% Operational" data-cn="全节点正常运转">100% Operational</span>
+                </div>
+            </div>
+
+            <div class="telemetry-item">
+                <div class="telemetry-icon-box" style="color: #60a5fa;">⚡</div>
+                <div class="telemetry-content">
+                    <span class="telemetry-label" data-en="Local Routing" data-cn="分流模式">Local Routing</span>
+                    <span class="telemetry-value" data-en="Auto Concurrent Ping" data-cn="并发测速自动优选">Auto Concurrent Ping</span>
+                </div>
+            </div>
+
+            <div class="telemetry-item">
+                <div class="telemetry-icon-box" style="color: #a78bfa;">🔄</div>
+                <div class="telemetry-content">
+                    <span class="telemetry-label" data-en="Sync Cadence" data-cn="同步周期">Sync Cadence</span>
+                    <span class="telemetry-value" data-en="Daily 00:00 UTC" data-cn="每日 00:00 UTC 自动更新">Daily 00:00 UTC</span>
+                </div>
+            </div>
+
+            <div class="telemetry-item">
+                <div class="telemetry-icon-box" style="color: #38bdf8;">🛡️</div>
+                <div class="telemetry-content">
+                    <span class="telemetry-label" data-en="Inclusion Rule" data-cn="准入原则">Inclusion Rule</span>
+                    <span class="telemetry-value" data-en="100% Free & Open" data-cn="纯开源 · 零商业收费">100% Free & Open</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subscription Cards Section -->
+        <div class="section-header">
             <div>
                 <h2 class="section-title">
                     <span>📦</span>
-                    <span data-en="Subscription Formats" data-cn="订阅格式选择">Subscription Formats</span>
+                    <span data-en="Subscription Matrix" data-cn="专属订阅格式">Subscription Matrix</span>
                 </h2>
-                <div class="section-desc" data-en="Choose your preferred subscription format and click to copy or import" data-cn="根据您使用的客户端选择对应格式，点击一键导入或复制链接">
-                    Choose your preferred subscription format and click to copy or import
+                <div class="section-subtitle" data-en="Hover to explore, click to import, copy link, or scan QR code" data-cn="选择适合您客户端的格式，一键导入、轻触复制或手机扫码">
+                    Hover to explore, click to import, copy link, or scan QR code
                 </div>
             </div>
         </div>
 
         <div class="cards-grid">
-            <!-- Clash YAML Card (Recommended) -->
-            <div class="sub-card featured">
-                <div class="card-top">
-                    <div class="card-header-row">
-                        <div class="card-icon-title">
-                            <div class="card-icon">🚀</div>
-                            <div>
-                                <div class="card-title-text">Clash YAML</div>
-                            </div>
+            <!-- Clash YAML Card -->
+            <div class="spotlight-card card-featured" onmousemove="handleCardSpotlight(event, this)">
+                <div class="card-inner">
+                    <div class="card-head">
+                        <div class="card-title-group">
+                            <div class="card-glyph" style="background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3);">🚀</div>
+                            <div class="card-heading">Clash YAML</div>
                         </div>
-                        <span class="badge-recommended" data-en="Recommended" data-cn="强烈推荐">Recommended</span>
+                        <span class="badge-pill-rec" data-en="Recommended" data-cn="强烈推荐">Recommended</span>
                     </div>
 
-                    <p class="card-desc" data-en="Tailored for Clash Verge Rev and Clash Meta. Built-in Auto node group automatically switches to the fastest responsive node."
-                       data-cn="适配 Clash Verge Rev、Clash Meta。内置 Auto 自动优选策略组，在您本地网络中自动切换至低延迟可用节点。">
-                        Tailored for Clash Verge Rev and Clash Meta. Built-in Auto node group automatically switches to the fastest responsive node.
+                    <p class="card-explanation"
+                       data-en="Tailored for Clash Verge Rev and Clash Meta. Features local concurrent ping failover to automatically route through the lowest-latency live node."
+                       data-cn="适配 Clash Verge Rev、Clash Meta。内置 Auto 自动优选策略组，在您本地网络中并发测活并无感切换至最快可用节点。">
+                        Tailored for Clash Verge Rev and Clash Meta. Features local concurrent ping failover to automatically route through the lowest-latency live node.
                     </p>
 
-                    <div class="card-tags">
-                        <span class="tag">Clash Verge Rev</span>
-                        <span class="tag">Auto Failover</span>
-                        <span class="tag">Smart Routing</span>
+                    <div class="card-features">
+                        <span class="feature-tag">Clash Verge Rev</span>
+                        <span class="feature-tag">Auto Failover</span>
+                        <span class="feature-tag">Smart Routing</span>
                     </div>
 
-                    <div class="url-preview" id="url-preview-clash">
+                    <div class="url-box" id="url-clash">
                         https://raw.githubusercontent.com/awesome-vpn/awesome-vpn/master/clash.yaml
                     </div>
                 </div>
 
-                <div class="card-actions">
-                    <button class="btn-action-import" onclick="importClash()">
+                <div class="card-btn-stack">
+                    <button class="btn-card-import" onclick="importClash()">
                         <span>⚡</span>
                         <span data-en="One-Click Import to Clash" data-cn="一键导入到 Clash">One-Click Import to Clash</span>
                     </button>
-                    <button class="btn-action-copy" onclick="copySubscription('clash', this)">
-                        <span>📋</span>
-                        <span data-en="Copy Clash Link" data-cn="复制 Clash 订阅链接">Copy Clash Link</span>
-                    </button>
+                    <div class="btn-card-dual">
+                        <button class="btn-card-copy" onclick="copySubscription('clash', this)">
+                            <span>📋</span>
+                            <span data-en="Copy Clash Link" data-cn="复制 Clash 订阅链接">Copy Clash Link</span>
+                        </button>
+                        <button class="btn-card-qr-icon" onclick="openQrModal('clash')" title="QR Code">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- Sing-box JSON Card -->
-            <div class="sub-card">
-                <div class="card-top">
-                    <div class="card-header-row">
-                        <div class="card-icon-title">
-                            <div class="card-icon">⚙️</div>
-                            <div>
-                                <div class="card-title-text">Sing-box JSON</div>
-                            </div>
+            <div class="spotlight-card" onmousemove="handleCardSpotlight(event, this)">
+                <div class="card-inner">
+                    <div class="card-head">
+                        <div class="card-title-group">
+                            <div class="card-glyph" style="background: rgba(139, 92, 246, 0.15); border-color: rgba(139, 92, 246, 0.3);">⚙️</div>
+                            <div class="card-heading">Sing-box JSON</div>
                         </div>
-                        <span class="badge-core">Sing-box</span>
+                        <span class="badge-pill-tech">Sing-box</span>
                     </div>
 
-                    <p class="card-desc" data-en="Universal configuration for Sing-box and NekoBox. Modern routing engine with ultra-low memory usage."
-                       data-cn="适配 Sing-box、NekoBox 客户端。采用现代网络核心，占用极低，分流精准高效。">
-                        Universal configuration for Sing-box and NekoBox. Modern routing engine with ultra-low memory usage.
+                    <p class="card-explanation"
+                       data-en="Next-generation proxy configuration for Sing-box and NekoBox. Modern routing engine with ultra-low memory footprint and strict ruleset matching."
+                       data-cn="适配 Sing-box、NekoBox 客户端。采用现代网络核心，占用极低，分流规则更精准高效。">
+                        Next-generation proxy configuration for Sing-box and NekoBox. Modern routing engine with ultra-low memory footprint and strict ruleset matching.
                     </p>
 
-                    <div class="card-tags">
-                        <span class="tag">Sing-box</span>
-                        <span class="tag">NekoBox</span>
-                        <span class="tag">Modern Core</span>
+                    <div class="card-features">
+                        <span class="feature-tag">Sing-box</span>
+                        <span class="feature-tag">NekoBox</span>
+                        <span class="feature-tag">Low Memory</span>
                     </div>
 
-                    <div class="url-preview" id="url-preview-singbox">
+                    <div class="url-box" id="url-singbox">
                         https://raw.githubusercontent.com/awesome-vpn/awesome-vpn/master/sing-box.json
                     </div>
                 </div>
 
-                <div class="card-actions">
-                    <button class="btn-action-import" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);" onclick="importSingbox()">
+                <div class="card-btn-stack">
+                    <button class="btn-card-import" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); box-shadow: 0 4px 16px -2px var(--violet-glow);" onclick="importSingbox()">
                         <span>⚡</span>
                         <span data-en="One-Click Import to Sing-box" data-cn="一键导入到 Sing-box">One-Click Import to Sing-box</span>
                     </button>
-                    <button class="btn-action-copy" onclick="copySubscription('singbox', this)">
-                        <span>📋</span>
-                        <span data-en="Copy Sing-box Link" data-cn="复制 Sing-box 订阅链接">Copy Sing-box Link</span>
-                    </button>
+                    <div class="btn-card-dual">
+                        <button class="btn-card-copy" onclick="copySubscription('singbox', this)">
+                            <span>📋</span>
+                            <span data-en="Copy Sing-box Link" data-cn="复制 Sing-box 订阅链接">Copy Sing-box Link</span>
+                        </button>
+                        <button class="btn-card-qr-icon" onclick="openQrModal('singbox')" title="QR Code">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- Base64 Universal Card -->
-            <div class="sub-card">
-                <div class="card-top">
-                    <div class="card-header-row">
-                        <div class="card-icon-title">
-                            <div class="card-icon">📋</div>
-                            <div>
-                                <div class="card-title-text">Base64 Universal</div>
-                            </div>
+            <div class="spotlight-card" onmousemove="handleCardSpotlight(event, this)">
+                <div class="card-inner">
+                    <div class="card-head">
+                        <div class="card-title-group">
+                            <div class="card-glyph" style="background: rgba(6, 182, 212, 0.15); border-color: rgba(6, 182, 212, 0.3);">📋</div>
+                            <div class="card-heading">Base64 Universal</div>
                         </div>
-                        <span class="badge-core" style="background: rgba(59, 130, 246, 0.15); color: #93c5fd; border-color: rgba(59, 130, 246, 0.3);" data-en="Universal" data-cn="通用">Universal</span>
+                        <span class="badge-pill-tech" style="background: rgba(6, 182, 212, 0.15); color: #67e8f9; border-color: rgba(6, 182, 212, 0.3);" data-en="Universal" data-cn="通用订阅">Universal</span>
                     </div>
 
-                    <p class="card-desc" data-en="Classic Base64 encoded node list. Maximum compatibility across legacy Android, iOS, Windows, and Linux clients."
-                       data-cn="经典 Base64 编码节点明文集合。高通用性，适用于各类移动端和老牌代理客户端。">
-                        Classic Base64 encoded node list. Maximum compatibility across legacy Android, iOS, Windows, and Linux clients.
+                    <p class="card-explanation"
+                       data-en="Standard Base64 encoded proxy list. Broadest compatibility across legacy Android, iOS, Windows, and router clients."
+                       data-cn="经典 Base64 编码节点集合。具有最高的通用性与兼容性，适用于各类移动端和第三方开源客户端。">
+                        Standard Base64 encoded proxy list. Broadest compatibility across legacy Android, iOS, Windows, and router clients.
                     </p>
 
-                    <div class="card-tags">
-                        <span class="tag">v2rayNG</span>
-                        <span class="tag">v2rayN</span>
-                        <span class="tag">Streisand</span>
+                    <div class="card-features">
+                        <span class="feature-tag">v2rayNG</span>
+                        <span class="feature-tag">v2rayN</span>
+                        <span class="feature-tag">Streisand</span>
                     </div>
 
-                    <div class="url-preview" id="url-preview-all">
+                    <div class="url-box" id="url-all">
                         https://raw.githubusercontent.com/awesome-vpn/awesome-vpn/master/all
                     </div>
                 </div>
 
-                <div class="card-actions">
-                    <button class="btn-action-copy" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #fff; border: none;" onclick="copySubscription('all', this)">
-                        <span>📋</span>
-                        <span data-en="Copy Base64 Link" data-cn="复制 Base64 订阅链接">Copy Base64 Link</span>
-                    </button>
+                <div class="card-btn-stack">
+                    <div class="btn-card-dual" style="grid-template-columns: 1fr auto;">
+                        <button class="btn-card-copy" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; border: none;" onclick="copySubscription('all', this)">
+                            <span>📋</span>
+                            <span data-en="Copy Base64 Link" data-cn="复制 Base64 订阅链接">Copy Base64 Link</span>
+                        </button>
+                        <button class="btn-card-qr-icon" onclick="openQrModal('all')" title="QR Code">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- 30-Second Quick Start Guide -->
-        <section class="guide-section">
+        <section class="guide-box">
             <h2 class="section-title">
                 <span>🚀</span>
                 <span data-en="30-Second Quick Start" data-cn="30 秒极速上手指南">30-Second Quick Start</span>
             </h2>
 
-            <div class="steps-grid">
-                <div class="step-item">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h4 data-en="Import or Copy" data-cn="导入或复制链接">Import or Copy</h4>
-                        <p data-en="Click 'One-Click Import to Clash' above, or copy a subscription link address."
-                           data-cn="直接点击上方的「一键导入到 Clash」，或者点击复制适合您的订阅链接。">
-                            Click 'One-Click Import to Clash' above, or copy a subscription link address.
+            <div class="steps-container">
+                <div class="step-tile">
+                    <div class="step-index-badge">01</div>
+                    <div class="step-text">
+                        <h4 data-en="Import or Scan" data-cn="导入或扫码">Import or Scan</h4>
+                        <p data-en="Click 'One-Click Import to Clash' above, or click 'Scan with Phone' to read the QR code on your mobile device."
+                           data-cn="点击页面上方的「一键导入到 Clash」，或者点击「手机扫码导入」使用移动端相机/客户端扫码。">
+                            Click 'One-Click Import to Clash' above, or click 'Scan with Phone' to read the QR code on your mobile device.
                         </p>
                     </div>
                 </div>
 
-                <div class="step-item">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h4 data-en="Open Client & Update" data-cn="打开客户端并更新">Open Client & Update</h4>
-                        <p data-en="In your client, paste the subscription URL if not imported automatically, then click 'Update'."
-                           data-cn="在客户端内粘贴订阅地址（一键导入则会自动保存），点击更新拉取节点。">
-                            In your client, paste the subscription URL if not imported automatically, then click 'Update'.
+                <div class="step-tile">
+                    <div class="step-index-badge">02</div>
+                    <div class="step-text">
+                        <h4 data-en="Update Profile" data-cn="拉取并更新节点">Update Profile</h4>
+                        <p data-en="Open your client, verify the newly saved subscription profile, and click 'Update' to fetch fresh live nodes."
+                           data-cn="在客户端内确认已导入的订阅配置，点击更新获取最新测活节点列表。">
+                            Open your client, verify the newly saved subscription profile, and click 'Update' to fetch fresh live nodes.
                         </p>
                     </div>
                 </div>
 
-                <div class="step-item">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h4 data-en="Select 'Auto' & Connect" data-cn="选择「Auto」并开启">Select 'Auto' & Connect</h4>
-                        <p data-en="Keep the 'Auto' policy selected so your client dynamically routes via the lowest-latency live node."
-                           data-cn="保持选择「Auto / 自动优选」分组，客户端会在你本地网络中实时动态测速并无感优选可用节点。">
-                            Keep the 'Auto' policy selected so your client dynamically routes via the lowest-latency live node.
+                <div class="step-tile">
+                    <div class="step-index-badge">03</div>
+                    <div class="step-text">
+                        <h4 data-en="Select 'Auto' & Connect" data-cn="选择「Auto」无感连接">Select 'Auto' & Connect</h4>
+                        <p data-en="Keep the 'Auto' proxy group selected. Your local client will test and auto-switch to the lowest-latency responsive node."
+                           data-cn="保持勾选「Auto / 自动优选」分组，客户端会在你本地网络并发测速并自动切换至低延迟可用节点。">
+                            Keep the 'Auto' proxy group selected. Your local client will test and auto-switch to the lowest-latency responsive node.
                         </p>
                     </div>
                 </div>
@@ -1085,20 +1604,20 @@
         </section>
 
         <!-- Recommended Clients Grid -->
-        <section class="clients-section">
-            <div class="section-title-wrap">
+        <section class="clients-wrapper">
+            <div class="section-header">
                 <div>
                     <h2 class="section-title">
                         <span>💻</span>
                         <span data-en="Recommended Free & Open-Source Clients" data-cn="推荐纯免费开源客户端">Recommended Free & Open-Source Clients</span>
                     </h2>
-                    <div class="section-desc" data-en="We strictly recommend 100% open-source, ad-free, non-commercial software" data-cn="本项目坚决仅推荐 100% 纯开源、零广告、零内购的优质客户端">
-                        We strictly recommend 100% open-source, ad-free, non-commercial software
+                    <div class="section-subtitle" data-en="Strictly curated 100% open-source, ad-free, non-commercial software" data-cn="准入原则：仅推荐 100% 纯开源、零广告、零内购的优质客户端">
+                        Strictly curated 100% open-source, ad-free, non-commercial software
                     </div>
                 </div>
             </div>
 
-            <div class="client-policy-note">
+            <div class="policy-tag-pill">
                 <span>🛡️</span>
                 <span data-en="Strict Policy: 100% Free & Open-Source Only · Zero Ads · Zero Paywalls"
                       data-cn="准入原则：仅推荐 100% 纯开源免费客户端 · 拒绝广告 · 拒绝商业收费">
@@ -1106,64 +1625,64 @@
                 </span>
             </div>
 
-            <div class="clients-grid">
+            <div class="clients-cards-row">
                 <!-- Windows -->
-                <div class="client-card">
-                    <div class="client-os">
+                <div class="client-box">
+                    <div class="client-platform">
                         <span>🪟</span>
                         <span>Windows</span>
                     </div>
-                    <div class="client-name">Clash Verge Rev / v2rayN</div>
-                    <div class="client-links">
-                        <a href="https://github.com/clash-verge-rev/clash-verge-rev/releases" target="_blank" class="client-link-btn">
+                    <div class="client-software-title">Clash Verge Rev / v2rayN</div>
+                    <div class="client-action-buttons">
+                        <a href="https://github.com/clash-verge-rev/clash-verge-rev/releases" target="_blank" class="client-btn">
                             Clash Verge Rev ↗
                         </a>
-                        <a href="https://github.com/2dust/v2rayN/releases" target="_blank" class="client-link-btn">
+                        <a href="https://github.com/2dust/v2rayN/releases" target="_blank" class="client-btn">
                             v2rayN ↗
                         </a>
                     </div>
                 </div>
 
                 <!-- macOS -->
-                <div class="client-card">
-                    <div class="client-os">
+                <div class="client-box">
+                    <div class="client-platform">
                         <span>🍎</span>
                         <span>macOS</span>
                     </div>
-                    <div class="client-name">Clash Verge Rev</div>
-                    <div class="client-links">
-                        <a href="https://github.com/clash-verge-rev/clash-verge-rev/releases" target="_blank" class="client-link-btn">
+                    <div class="client-software-title">Clash Verge Rev</div>
+                    <div class="client-action-buttons">
+                        <a href="https://github.com/clash-verge-rev/clash-verge-rev/releases" target="_blank" class="client-btn">
                             Clash Verge Rev ↗
                         </a>
                     </div>
                 </div>
 
                 <!-- Linux -->
-                <div class="client-card">
-                    <div class="client-os">
+                <div class="client-box">
+                    <div class="client-platform">
                         <span>🐧</span>
                         <span>Linux</span>
                     </div>
-                    <div class="client-name">Clash Verge Rev</div>
-                    <div class="client-links">
-                        <a href="https://github.com/clash-verge-rev/clash-verge-rev/releases" target="_blank" class="client-link-btn">
+                    <div class="client-software-title">Clash Verge Rev</div>
+                    <div class="client-action-buttons">
+                        <a href="https://github.com/clash-verge-rev/clash-verge-rev/releases" target="_blank" class="client-btn">
                             Clash Verge Rev ↗
                         </a>
                     </div>
                 </div>
 
                 <!-- Android -->
-                <div class="client-card">
-                    <div class="client-os">
+                <div class="client-box">
+                    <div class="client-platform">
                         <span>🤖</span>
                         <span>Android</span>
                     </div>
-                    <div class="client-name">v2rayNG / NekoBox</div>
-                    <div class="client-links">
-                        <a href="https://github.com/2dust/v2rayNG/releases" target="_blank" class="client-link-btn">
+                    <div class="client-software-title">v2rayNG / NekoBox</div>
+                    <div class="client-action-buttons">
+                        <a href="https://github.com/2dust/v2rayNG/releases" target="_blank" class="client-btn">
                             v2rayNG ↗
                         </a>
-                        <a href="https://github.com/MatsuriDayo/NekoBoxForAndroid/releases" target="_blank" class="client-link-btn">
+                        <a href="https://github.com/MatsuriDayo/NekoBoxForAndroid/releases" target="_blank" class="client-btn">
                             NekoBox ↗
                         </a>
                     </div>
@@ -1182,6 +1701,46 @@
                 </a>
             </p>
         </footer>
+    </div>
+
+    <!-- Mobile Bottom Quickbar -->
+    <div class="mobile-quickbar">
+        <div class="mobile-quickbar-grid">
+            <button class="btn-mob-quick" style="background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;" onclick="importClash()">
+                <span>⚡</span>
+                <span data-en="Clash Import" data-cn="Clash 一键导入">Clash 一键导入</span>
+            </button>
+            <button class="btn-mob-quick" style="background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid var(--border-subtle);" onclick="openQrModal('clash')">
+                <span>📱</span>
+                <span data-en="Scan QR" data-cn="扫码导入">扫码导入</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- QR Code HUD Modal -->
+    <div class="modal-overlay" id="qr-modal" onclick="handleModalBackdropClick(event)">
+        <div class="modal-card">
+            <button class="modal-close-btn" onclick="closeQrModal()" title="Close">✕</button>
+            <h3 style="font-size: 1.3rem; margin-bottom: 6px;" data-en="📱 Scan with Client" data-cn="📱 客户端扫码导入">📱 Scan with Client</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);" data-en="Open v2rayNG, NekoBox, or Sing-box and scan this QR code" data-cn="使用客户端扫码功能，扫描下方二维码直接导入订阅">
+                Open v2rayNG, NekoBox, or Sing-box and scan this QR code
+            </p>
+
+            <div class="modal-qr-frame">
+                <div id="modal-qrcode"></div>
+            </div>
+
+            <div class="modal-type-tabs">
+                <button class="modal-type-btn active" id="modal-tab-clash" onclick="setModalType('clash')">Clash YAML</button>
+                <button class="modal-type-btn" id="modal-tab-singbox" onclick="setModalType('singbox')">Sing-box</button>
+                <button class="modal-type-btn" id="modal-tab-all" onclick="setModalType('all')">Base64</button>
+            </div>
+
+            <button class="btn-card-copy" style="width: 100%;" onclick="copyCurrentModalUrl()">
+                <span>📋</span>
+                <span data-en="Copy Subscription URL" data-cn="复制当前订阅链接">Copy Subscription URL</span>
+            </button>
+        </div>
     </div>
 
     <!-- Toast Notification Container -->
@@ -1204,8 +1763,122 @@
 
         let currentMirror = 'raw';
         let currentLang = 'en';
+        let currentModalType = 'clash';
+        let qrCodeInstance = null;
 
-        // Detect default language
+        // Interactive background particle constellation
+        (function initCanvasBackground() {
+            const canvas = document.getElementById('bg-canvas');
+            const ctx = canvas.getContext('2d');
+
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+
+            const isMobile = window.innerWidth < 768;
+            const particleCount = isMobile ? 32 : 72;
+            const maxDistance = isMobile ? 90 : 130;
+
+            const particles = [];
+            const mouse = { x: null, y: null, radius: 140 };
+
+            window.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+            });
+
+            window.addEventListener('mouseout', () => {
+                mouse.x = null;
+                mouse.y = null;
+            });
+
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            });
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.vx = (Math.random() - 0.5) * 0.45;
+                    this.vy = (Math.random() - 0.5) * 0.45;
+                    this.radius = Math.random() * 1.8 + 0.8;
+                    this.color = Math.random() > 0.4 ? 'rgba(59, 130, 246,' : 'rgba(6, 182, 212,';
+                }
+
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    if (this.x < 0 || this.x > width) this.vx = -this.vx;
+                    if (this.y < 0 || this.y > height) this.vy = -this.vy;
+
+                    // Mouse interaction
+                    if (mouse.x !== null && mouse.y !== null) {
+                        const dx = mouse.x - this.x;
+                        const dy = mouse.y - this.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < mouse.radius) {
+                            const angle = Math.atan2(dy, dx);
+                            const force = (mouse.radius - dist) / mouse.radius;
+                            this.x -= Math.cos(angle) * force * 1.5;
+                            this.y -= Math.sin(angle) * force * 1.5;
+                        }
+                    }
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color + '0.6)';
+                    ctx.fill();
+                }
+            }
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < maxDistance) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            const alpha = (1 - dist / maxDistance) * 0.18;
+                            ctx.strokeStyle = `rgba(59, 130, 246, ${alpha})`;
+                            ctx.lineWidth = 0.8;
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        })();
+
+        // Card cursor spotlight effect
+        function handleCardSpotlight(e, card) {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+        }
+
+        // Language initial setup
         (function initLang() {
             const savedLang = localStorage.getItem('awesome_vpn_lang');
             if (savedLang) {
@@ -1235,25 +1908,31 @@
             });
         }
 
+        // Mirror switcher
         function setMirror(mirror) {
             currentMirror = mirror;
             document.getElementById('mirror-raw').classList.toggle('active', mirror === 'raw');
             document.getElementById('mirror-cdn').classList.toggle('active', mirror === 'cdn');
 
-            // Update preview texts
-            document.getElementById('url-preview-clash').textContent = URLS[mirror].clash;
-            document.getElementById('url-preview-singbox').textContent = URLS[mirror].singbox;
-            document.getElementById('url-preview-all').textContent = URLS[mirror].all;
+            // Update visible preview boxes
+            document.getElementById('url-clash').textContent = URLS[mirror].clash;
+            document.getElementById('url-singbox').textContent = URLS[mirror].singbox;
+            document.getElementById('url-all').textContent = URLS[mirror].all;
 
-            showToast(currentLang === 'cn' ? '已切换至: ' + (mirror === 'raw' ? 'GitHub Raw' : 'jsDelivr 镜像加速') : 'Source switched to: ' + (mirror === 'raw' ? 'GitHub Raw' : 'jsDelivr CDN'));
+            // Update QR code if modal open
+            if (document.getElementById('qr-modal').classList.contains('open')) {
+                renderQrCode(URLS[currentMirror][currentModalType]);
+            }
+
+            showToast(currentLang === 'cn' ? '已切换至: ' + (mirror === 'raw' ? 'GitHub 官方源' : 'jsDelivr 镜像加速') : 'Source switched to: ' + (mirror === 'raw' ? 'GitHub Raw' : 'jsDelivr CDN'));
         }
 
+        // Copy subscription function
         function copySubscription(type, btnElement) {
             const url = URLS[currentMirror][type];
             navigator.clipboard.writeText(url).then(() => {
                 handleCopySuccess(btnElement);
             }).catch(() => {
-                // Fallback for older browsers or permission block
                 const textArea = document.createElement('textarea');
                 textArea.value = url;
                 document.body.appendChild(textArea);
@@ -1281,6 +1960,7 @@
             showToast(currentLang === 'cn' ? '订阅链接已复制到剪贴板！' : 'Subscription link copied to clipboard!');
         }
 
+        // One-click import functions
         function importClash() {
             const targetUrl = URLS[currentMirror].clash;
             const clashScheme = 'clash://install-config?url=' + encodeURIComponent(targetUrl) + '&name=AwesomeVPN';
@@ -1295,11 +1975,83 @@
             window.location.href = singboxScheme;
         }
 
+        // QR Code Modal handling
+        function openQrModal(type) {
+            currentModalType = type || 'clash';
+            updateModalTabs();
+
+            const modal = document.getElementById('qr-modal');
+            modal.classList.add('open');
+
+            renderQrCode(URLS[currentMirror][currentModalType]);
+        }
+
+        function closeQrModal() {
+            document.getElementById('qr-modal').classList.remove('open');
+        }
+
+        function handleModalBackdropClick(e) {
+            if (e.target === document.getElementById('qr-modal')) {
+                closeQrModal();
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeQrModal();
+            }
+        });
+
+        function setModalType(type) {
+            currentModalType = type;
+            updateModalTabs();
+            renderQrCode(URLS[currentMirror][type]);
+        }
+
+        function updateModalTabs() {
+            ['clash', 'singbox', 'all'].forEach(t => {
+                const tab = document.getElementById('modal-tab-' + t);
+                if (tab) tab.classList.toggle('active', t === currentModalType);
+            });
+        }
+
+        function renderQrCode(text) {
+            const container = document.getElementById('modal-qrcode');
+            container.innerHTML = '';
+
+            if (typeof QRCode !== 'undefined') {
+                qrCodeInstance = new QRCode(container, {
+                    text: text,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#0f172a",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } else {
+                // Fallback if script is blocked
+                const img = document.createElement('img');
+                img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(text);
+                img.alt = 'QR Code';
+                img.width = 200;
+                img.height = 200;
+                container.appendChild(img);
+            }
+        }
+
+        function copyCurrentModalUrl() {
+            const url = URLS[currentMirror][currentModalType];
+            navigator.clipboard.writeText(url).then(() => {
+                showToast(currentLang === 'cn' ? '链接已复制！' : 'URL copied!');
+            });
+        }
+
+        // Toast notification
         function showToast(message) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = '<span class="toast-icon">⚡</span><span>' + message + '</span>';
+            toast.className = 'toast-bubble';
+            toast.innerHTML = '<span class="toast-bubble-icon">⚡</span><span>' + message + '</span>';
             container.appendChild(toast);
 
             setTimeout(() => {
